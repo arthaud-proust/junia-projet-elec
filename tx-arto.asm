@@ -32,11 +32,66 @@ _TX_64LEDS:
     MOVWF FSR0L, 0      ; DÃ©finit le LSB du registre d'adressage indirect
     MOVFF _pC + 1, WREG ; Charge le MSB du pointeur de LED_MATRIX dans WREG
     MOVWF FSR0H, 0      ; DÃ©finit le MSB du registre d'adressage indirect
+    
+   
 
-    ; DÃ©sormais, dÃ¨s l'exÃ©cution de l'instruction suivante, la valeur pointÃ©e par <FSR0H-FSR0L> est chargÃ©e dans WREG, et <FSR0H-FSR0L> est incrÃ©mentÃ© :
-    ; MOVF POSTINC0, 0, 0
+    ; il faut incrémenter sur chaque bit de l'octet
+    ;TODO
+    
+    ; si bit == 1 :
+     SET_1
+    ; sinon :
+    SET_0
 
-    ; Envoie la commande pour piloter chacune des 64 LEDs
+    ; Désormais, dans l'exécution de l'instruction suivante, la valeur pointée par <FSR0H-FSR0L> est chargée dans WREG, et <FSR0H-FSR0L> est incrémenté :
+    ; incrémente de un octet
+    MOVF POSTINC0, 0, 0
+    
+    ;boucler au début 63 fois
     ; TODO
+    
+    RETURN
 
+SET_0:
+    ; on envoie HAUT pendant 0,32us, puis BAS pendant 0,93us
+    ; c'est à dire qu'on envoie 2,9 fois plus de HAUT que de BAS
+    BANKSEL LATB ; sélectionner CMD_MATRIX
+   
+    BSF LATB, 5 ; allumer le bit 5 de CMD_MATRIX
+    ; on détermine expérimentalement le nombre d'instructions pour atteindre 0,32us
+    NOP   
+    NOP
+
+    
+    BCF LATB, 5 ; éteindre le bit 5 de CMD_MATRIX
+    ; on écrit 2,9 fois plus d'instructions pour atteindre 0,93us
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    
+    RETURN
+    
+SET_1:
+    ; on envoie HAUT pendant 0,82us, puis BAS pendant 0,43us
+    ; c'est à dire qu'on envoie 2,9 fois plus de HAUT que de BAS
+    BANKSEL LATB ; sélectionner CMD_MATRIX
+   
+    BSF LATB, 5 ; allumer le bit 5 de CMD_MATRIX
+    ; on détermine expérimentalement le nombre d'instructions pour atteindre 0,82us
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    
+    BCF LATB, 5 ; éteindre le bit 5 de CMD_MATRIX
+    ; on écrit 0,5 fois plus d'instructions pour atteindre 0,43us
+    NOP
+    NOP
+    NOP
+    
     RETURN
