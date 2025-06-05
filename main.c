@@ -68,6 +68,8 @@ void main(void) {
     allumer_led(7, 3);
     
     while(1) {
+        // reset les leds en envoyant 0 pendant plus de 80us (88us mesuré)
+        __delay_us(5); 
         TX_64LEDS(); 
     }
       
