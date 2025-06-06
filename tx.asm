@@ -75,14 +75,7 @@ SEND_1 MACRO
 ENDM
       
     
-SEND_OCTET:
-    ; l'optimisation est hyper importante, il faut que les délais d'envoi soient les mêmes
-    ; entre chaque bit et entre chaque octet.
-    ; Mais entre chaque octet on a une instruction supplémentaire : le MOVF
-    ; On optimise donc au max les if/else, pour gagner du temps et on utilise 
-    ; ce temps gagné pour rajouter des nop entre chaque envoi de bit 
-    ; pour équilibrer avec le temps pris par le MVF entre chaque envoi d'octet
-    
+SEND_OCTET: 
     ; Désormais, dans l'exécution de l'instruction suivante, la valeur pointée par <FSR0H-FSR0L> est chargée dans WREG, et <FSR0H-FSR0L> est incrémenté :
     ; incrémente de un octet
     MOVF POSTINC0, 0, 0
@@ -94,13 +87,6 @@ SEND_OCTET:
     B7_SEND_1:
     SEND_1
     END_B7:
-    
-    ; pour équilibrer avec le MOVF
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
 
     BTFSC WREG, 6 ; saute l'instruction suivante si le bit==0
     GOTO B6_SEND_1 ; si le bit==1
@@ -109,13 +95,6 @@ SEND_OCTET:
     B6_SEND_1:
     SEND_1
     END_B6:
-    
-    ; pour équilibrer avec le MOVF
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
 
     BTFSC WREG, 5 ; saute l'instruction suivante si le bit==0
     GOTO B5_SEND_1 ; si le bit==1
@@ -124,14 +103,7 @@ SEND_OCTET:
     B5_SEND_1:
     SEND_1
     END_B5:
-    
-    ; pour équilibrer avec le MOVF
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
-
+ 
     BTFSC WREG, 4 ; saute l'instruction suivante si le bit==0
     GOTO B4_SEND_1 ; si le bit==1
     SEND_0
@@ -139,13 +111,6 @@ SEND_OCTET:
     B4_SEND_1:
     SEND_1
     END_B4:
-    
-    ; pour équilibrer avec le MOVF
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
 
     BTFSC WREG, 3 ; saute l'instruction suivante si le bit==0
     GOTO B3_SEND_1 ; si le bit==1
@@ -154,13 +119,6 @@ SEND_OCTET:
     B3_SEND_1:
     SEND_1
     END_B3:
-    
-    ; pour équilibrer avec le MOVF
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
 
     BTFSC WREG, 2 ; saute l'instruction suivante si le bit==0
     GOTO B2_SEND_1 ; si le bit==1
@@ -169,13 +127,6 @@ SEND_OCTET:
     B2_SEND_1:
     SEND_1
     END_B2:
-
-    ; pour équilibrer avec le MOVF
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
     
     BTFSC WREG, 1 ; saute l'instruction suivante si le bit==0
     GOTO B1_SEND_1 ; si le bit==1
@@ -184,13 +135,6 @@ SEND_OCTET:
     B1_SEND_1:
     SEND_1
     END_B1:
-    
-    ; pour équilibrer avec le MOVF
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
 
     BTFSC WREG, 0 ; saute l'instruction suivante si le bit==0
     GOTO B0_SEND_1 ; si le bit==1
@@ -201,25 +145,6 @@ SEND_OCTET:
     END_B0:
     
     RETURN
-    
-SEND_LED MACRO
-    CALL SEND_OCTET
-    CALL SEND_OCTET
-    CALL SEND_OCTET
-    CALL SEND_OCTET
-ENDM
-    
-SEND_LED_LINE MACRO
-    SEND_LED
-    SEND_LED
-    SEND_LED
-    SEND_LED
-    
-    SEND_LED
-    SEND_LED
-    SEND_LED
-    SEND_LED
-ENDM
 
 _TX_64LEDS:
     ; Cette fonction envoie sur CMD_MATRIX l'intégralité de la matrice LED_MATRIX,
@@ -234,14 +159,7 @@ _TX_64LEDS:
     
     BANKSEL LATB ; sélectionner CMD_MATRIX
     
-    SEND_LED_LINE
-    SEND_LED_LINE
-    SEND_LED_LINE
-    SEND_LED_LINE
-    
-    SEND_LED_LINE
-    SEND_LED_LINE
-    SEND_LED_LINE
-    SEND_LED_LINE
-    
+    REPT 256
+	CALL SEND_OCTET
+    ENDM
     
