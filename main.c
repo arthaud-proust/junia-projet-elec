@@ -35,7 +35,7 @@ volatile const char * pC = LED_MATRIX; // Pointeur vers LED_MATRIX
 
 void led(int col, int row, int red, int green, int blue, int white) {
   LED_MATRIX[(col-1)*4*8 + (row-1)*4] = green; 
-  LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 1] = red   
+  LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 1] = red;
   LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 2] = blue; 
   LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 3] = white; 
 }
@@ -51,7 +51,7 @@ void test_col(int col, int red, int green, int blue, int white) {
   led(col, 8, red, green, blue, white);
 }
 
-void test_row(int row) {
+void test_row(int row, int red, int green, int blue, int white) {
   led(1, row, red, green, blue, white);
   led(2, row, red, green, blue, white);
   led(3, row, red, green, blue, white);
@@ -109,7 +109,7 @@ void allumer_col_volume(int col, int volume, int red, int green, int blue, int w
         led(col, 7, 0, 0, 0, 0);
     }
 
-    if(volume=8) {
+    if(volume==8) {
         led(col, 8, red, green, blue, white);
     } else {
         led(col, 8, 0, 0, 0, 0);
