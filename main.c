@@ -37,6 +37,32 @@ void allumer_led(int col, int row) {
    LED_MATRIX[(col-1)*4*8 + (row-1)*4] = 16; 
 }
 
+void eteindre_led(int col, int row) {
+   LED_MATRIX[(col-1)*4*8 + (row-1)*4] = 0; 
+}
+
+void allumer_colonne(int col) {
+    allumer_led(col,1);
+    allumer_led(col,2);
+    allumer_led(col,3);
+    allumer_led(col,4);
+    allumer_led(col,5);
+    allumer_led(col,6);    
+    allumer_led(col,7);
+    allumer_led(col,8);
+}
+
+void allumer_ligne(int row) {
+    allumer_led(1,row);
+    allumer_led(2,row);
+    allumer_led(3,row);
+    allumer_led(4,row);
+    allumer_led(5,row);
+    allumer_led(6,row);    
+    allumer_led(7,row);
+    allumer_led(8,row);
+}
+
 // - Fonction main ----------------------------------------------------------------------
 void main(void) {
     
@@ -54,22 +80,58 @@ void main(void) {
 
     // allume le vert de la première led
 
-    allumer_led(3, 5);
-    allumer_led(3, 6);
+//    for (int i = 0; i < 256; i++) {
+//        LED_MATRIX[i] = 0b11111111;
+//    }
     
-    allumer_led(6, 6);
-    allumer_led(6, 5);
+//    Smiley
+//    allumer_led(3, 5);
+//    allumer_led(3, 6);
+//    
+//    allumer_led(6, 6);
+//    allumer_led(6, 5);
+//    
+//    allumer_led(2, 3);
+//    allumer_led(3, 2);
+//    allumer_led(4, 2);
+//    allumer_led(5, 2);
+//    allumer_led(6, 2);
+//    allumer_led(7, 3);
     
-    allumer_led(2, 3);
-    allumer_led(3, 2);
-    allumer_led(4, 2);
-    allumer_led(5, 2);
-    allumer_led(6, 2);
-    allumer_led(7, 3);
+//    Croix
+//    allumer_led(1,1);
+//    allumer_led(2,2);
+//    allumer_led(3,3);
+//    allumer_led(4,4);
+//    allumer_led(5,5);
+//    allumer_led(6,6);
+//    allumer_led(7,7);
+//    allumer_led(8,8);
+//
+//    allumer_led(1,8);
+//    allumer_led(2,7);
+//    allumer_led(3,6);
+//    allumer_led(4,5);
+//    allumer_led(5,4);
+//    allumer_led(6,3);
+//    allumer_led(7,2);
+//    allumer_led(8,1);
+    
+//    Ligne
+//    allumer_ligne(1);
+
+    //    Colonne
+    allumer_colonne(1);    
+//    allumer_colonne(2);
+
+    
+//    allumer_colonne(4);
+    
+//    allumer_colonne(8);
     
     while(1) {
         // reset les leds en envoyant 0 pendant plus de 80us (88us mesuré)
-        __delay_us(5); 
+        __delay_us(200); 
         TX_64LEDS(); 
     }
       
