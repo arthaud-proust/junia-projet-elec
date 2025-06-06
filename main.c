@@ -33,41 +33,37 @@ volatile char LED_MATRIX [256] ; // Definition d'une matrice de 64 x 4 octets co
 volatile const char * pC = LED_MATRIX; // Pointeur vers LED_MATRIX
 
 
-void allumer_led(int col, int row) {
-   LED_MATRIX[(col-1)*4*8 + (row-1)*4] = 16; 
+void led(int col, int row, int red, int green, int blue, int white) {
+  LED_MATRIX[(col-1)*4*8 + (row-1)*4] = green; 
+  LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 1] = red   
+  LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 2] = blue; 
+  LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 3] = white; 
 }
 
-void eteindre_led(int col, int row) {
-   LED_MATRIX[(col-1)*4*8 + (row-1)*4] = 0; 
+void test_col(int col, int red, int green, int blue, int white) {
+  led(col, 1, red, green, blue, white);
+  led(col, 2, red, green, blue, white);
+  led(col, 3, red, green, blue, white);
+  led(col, 4, red, green, blue, white);
+  led(col, 5, red, green, blue, white);
+  led(col, 6, red, green, blue, white);    
+  led(col, 7, red, green, blue, white);
+  led(col, 8, red, green, blue, white);
 }
 
-void allumer_colonne(int col) {
-    allumer_led(col,1);
-    allumer_led(col,2);
-    allumer_led(col,3);
-    allumer_led(col,4);
-    allumer_led(col,5);
-    allumer_led(col,6);    
-    allumer_led(col,7);
-    allumer_led(col,8);
-}
-
-void allumer_ligne(int row) {
-    allumer_led(1,row);
-    allumer_led(2,row);
-    allumer_led(3,row);
-    allumer_led(4,row);
-    allumer_led(5,row);
-    allumer_led(6,row);    
-    allumer_led(7,row);
-    allumer_led(8,row);
+void test_row(int row) {
+  led(1, row, red, green, blue, white);
+  led(2, row, red, green, blue, white);
+  led(3, row, red, green, blue, white);
+  led(4, row, red, green, blue, white);
+  led(5, row, red, green, blue, white);
+  led(6, row, red, green, blue, white);    
+  led(7, row, red, green, blue, white);
+  led(8, row, red, green, blue, white);
 }
 
 // - Fonction main ----------------------------------------------------------------------
 void main(void) {
-    
-    
-    
     /* Configuration des entrées / sorties */
     TRISB &= 0b11011111; // port 5 en sortie (CMD_MATRIX)
 
@@ -78,56 +74,47 @@ void main(void) {
     /* Corps du programme */
     // TODO
 
-    // allume le vert de la première led
-
-//    for (int i = 0; i < 256; i++) {
-//        LED_MATRIX[i] = 0b11111111;
-//    }
     
 //    Smiley
-//    allumer_led(3, 5);
-//    allumer_led(3, 6);
-//    
-//    allumer_led(6, 6);
-//    allumer_led(6, 5);
-//    
-//    allumer_led(2, 3);
-//    allumer_led(3, 2);
-//    allumer_led(4, 2);
-//    allumer_led(5, 2);
-//    allumer_led(6, 2);
-//    allumer_led(7, 3);
+    led(3, 5, 16, 16, 0, 0);
+    led(3, 6, 16, 16, 0, 0);
+
+    led(6, 6, 16, 16, 0, 0);
+    led(6, 5, 16, 16, 0, 0);
+
+    led(2, 3, 16, 16, 0, 0);
+    led(3, 2, 16, 16, 0, 0);
+    led(4, 2, 16, 16, 0, 0);
+    led(5, 2, 16, 16, 0, 0);
+    led(6, 2, 16, 16, 0, 0);
+    led(7, 3, 16, 16, 0, 0);
     
 //    Croix
-//    allumer_led(1,1);
-//    allumer_led(2,2);
-//    allumer_led(3,3);
-//    allumer_led(4,4);
-//    allumer_led(5,5);
-//    allumer_led(6,6);
-//    allumer_led(7,7);
-//    allumer_led(8,8);
+//    led(1, 1, 16, 0, 0, 0);
+//    led(2, 2, 16, 0, 0, 0);
+//    led(3, 3, 16, 0, 0, 0);
+//    led(4, 4, 16, 0, 0, 0);
+//    led(5, 5, 16, 0, 0, 0);
+//    led(6, 6, 16, 0, 0, 0);
+//    led(7, 7, 16, 0, 0, 0);
+//    led(8, 8, 16, 0, 0, 0);
 //
-//    allumer_led(1,8);
-//    allumer_led(2,7);
-//    allumer_led(3,6);
-//    allumer_led(4,5);
-//    allumer_led(5,4);
-//    allumer_led(6,3);
-//    allumer_led(7,2);
-//    allumer_led(8,1);
+//    led(1, 8, 16, 0, 0, 0);
+//    led(2, 7, 16, 0, 0, 0);
+//    led(3, 6, 16, 0, 0, 0);
+//    led(4, 5, 16, 0, 0, 0);
+//    led(5, 4, 16, 0, 0, 0);
+//    led(6, 3, 16, 0, 0, 0);
+//    led(7, 2, 16, 0, 0, 0);
+//    led(8, 1, 16, 0, 0, 0);
     
 //    Ligne
-//    allumer_ligne(1);
+//    test_row(1, 16, 0, 0, 0);
 
-    //    Colonne
-    allumer_colonne(1);    
-//    allumer_colonne(2);
-
-    
-//    allumer_colonne(4);
-    
-//    allumer_colonne(8);
+//    Colonne
+//    test_col(2, 16, 0, 0, 0);
+//    test_col(4, 16, 0, 0, 0); 
+//    test_col(8, 16, 0, 0, 0);
     
     while(1) {
         // reset les leds en envoyant 0 pendant plus de 80us (88us mesuré)
