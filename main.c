@@ -62,6 +62,60 @@ void test_row(int row) {
   led(8, row, red, green, blue, white);
 }
 
+// volume entre 0 compris et 8 compris
+// volume à 0 = aucune led allumée
+// volume à 4 = la moité du bas allumé
+// volume à 8 = toutes les leds allumés
+void allumer_col_volume(int col, int volume, int red, int green, int blue, int white) {
+    if(volume>=1) {
+        led(col, 1, red, green, blue, white);
+    } else {
+        led(col, 1, 0, 0, 0, 0);
+    }
+
+    if(volume>=2) {
+        led(col, 2, red, green, blue, white);
+    } else {
+        led(col, 2, 0, 0, 0, 0);
+    }
+
+    if(volume>=3) {
+        led(col, 3, red, green, blue, white);
+    } else {
+        led(col, 3, 0, 0, 0, 0);
+    }
+
+    if(volume>=4) {
+        led(col, 4, red, green, blue, white);
+    } else {
+        led(col, 4, 0, 0, 0, 0);
+    }
+
+    if(volume>=5) {
+        led(col, 5, red, green, blue, white);
+    } else {
+        led(col, 5, 0, 0, 0, 0);
+    }
+
+    if(volume>=6) {
+        led(col, 6, red, green, blue, white);
+    } else {
+        led(col, 6, 0, 0, 0, 0);
+    }
+
+    if(volume>=7) {
+        led(col, 7, red, green, blue, white);
+    } else {
+        led(col, 7, 0, 0, 0, 0);
+    }
+
+    if(volume=8) {
+        led(col, 8, red, green, blue, white);
+    } else {
+        led(col, 8, 0, 0, 0, 0);
+    }
+}
+
 // - Fonction main ----------------------------------------------------------------------
 void main(void) {
     /* Configuration des entrées / sorties */
