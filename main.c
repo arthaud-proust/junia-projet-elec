@@ -170,6 +170,9 @@ void main(void) {
 //    test_col(4, 16, 0, 0, 0); 
 //    test_col(8, 16, 0, 0, 0);
     
+    // éteindre la led col8 row1 car défectueuse sur une matrice
+    led(8, 1, 0, 0, 0, 0);
+    
     while(1) {
         // reset les leds en envoyant 0 pendant plus de 80us (88us mesuré)
         __delay_us(200); 
