@@ -73,51 +73,51 @@ void test_row(int row, int red, int green, int blue, int white) {
 // volume à 8 = toutes les leds allumés
 void allumer_col_volume(int col, int volume, int red, int green, int blue, int white) {
     if(volume>=1) {
-        led(col, 1, red, green, blue, white);
+        led(col, 8, red, green, blue, white);
     } else {
-        led(col, 1, 0, 0, 0, 0);
+        led(col, 8, 0, 0, 0, 0);
     }
 
     if(volume>=2) {
-        led(col, 2, red, green, blue, white);
-    } else {
-        led(col, 2, 0, 0, 0, 0);
-    }
-
-    if(volume>=3) {
-        led(col, 3, red, green, blue, white);
-    } else {
-        led(col, 3, 0, 0, 0, 0);
-    }
-
-    if(volume>=4) {
-        led(col, 4, red, green, blue, white);
-    } else {
-        led(col, 4, 0, 0, 0, 0);
-    }
-
-    if(volume>=5) {
-        led(col, 5, red, green, blue, white);
-    } else {
-        led(col, 5, 0, 0, 0, 0);
-    }
-
-    if(volume>=6) {
-        led(col, 6, red, green, blue, white);
-    } else {
-        led(col, 6, 0, 0, 0, 0);
-    }
-
-    if(volume>=7) {
         led(col, 7, red, green, blue, white);
     } else {
         led(col, 7, 0, 0, 0, 0);
     }
 
-    if(volume==8) {
-        led(col, 8, red, green, blue, white);
+    if(volume>=3) {
+        led(col, 6, red, green, blue, white);
     } else {
-        led(col, 8, 0, 0, 0, 0);
+        led(col, 6, 0, 0, 0, 0);
+    }
+
+    if(volume>=4) {
+        led(col, 5, red, green, blue, white);
+    } else {
+        led(col, 5, 0, 0, 0, 0);
+    }
+
+    if(volume>=5) {
+        led(col, 4, red, green, blue, white);
+    } else {
+        led(col, 4, 0, 0, 0, 0);
+    }
+
+    if(volume>=6) {
+        led(col, 3, red, green, blue, white);
+    } else {
+        led(col, 3, 0, 0, 0, 0);
+    }
+
+    if(volume>=7) {
+        led(col, 2, red, green, blue, white);
+    } else {
+        led(col, 2, 0, 0, 0, 0);
+    }
+
+    if(volume>=8) {
+        led(col, 1, red, green, blue, white);
+    } else {
+        led(col, 1, 0, 0, 0, 0);
     }
 }
 
@@ -139,7 +139,7 @@ unsigned int ADC_Read(int channel) {
     ADCON0bits.GO = 1;
     while(ADCON0bits.GO);
     
-    return ((ADRESH << 8) | ADRESL);
+    return ((ADRESH << 8) | ADRESL) / 50;
 }
 
 // - Fonction main ----------------------------------------------------------------------
@@ -199,15 +199,7 @@ void main(void) {
     while(1) {
         unsigned int val = ADC_Read(CHANNEL_1);
         
-        LATC = 0x00;
-        if(val > 50) LATC |= 0b00000001;
-        if(val > 100) LATC |= 0b00000010;
-        if(val > 150) LATC |= 0b00000100;
-        if(val > 200) LATC |= 0b00001000;
-        if(val > 250) LATC |= 0b00010000;
-        if(val > 300) LATC |= 0b00100000;
-        if(val > 350) LATC |= 0b01000000;
-        if(val > 400) LATC |= 0b10000000;
+        allumer_col_volume(1, val, 16, 0, 0, 0);
         
         // reset les leds en envoyant 0 pendant plus de 80us (88us mesuré)
         __delay_us(200); 
