@@ -1,52 +1,45 @@
-/* --------------------------------------------------------------
- * Fichier     :   main.c
- * Auteur(s)   :
- * Description :
- * -------------------------------------------------------------- */
-
 #include <xc.h>
 
-// Configuration materielle du PIC :
-#pragma config FEXTOSC = OFF           // Pas de source d'horloge externe
-#pragma config RSTOSC = HFINTOSC_64MHZ // Horloge interne de 64 MHz
-#pragma config WDTE = OFF              // Désactiver le watchdog
+#pragma config FEXTOSC = OFF           
+#pragma config RSTOSC = HFINTOSC_64MHZ 
+#pragma config WDTE = OFF              
 
-#define _XTAL_FREQ 64000000 // Frequence d'horloge - necessaire aux macros de delay (_delay(N) ; __delay_us(N) ; __delay_ms(N)))
+#define _XTAL_FREQ 64000000
 
-// Définition des masques, macros, etc. :
-// TODO
+void ADC_Init(void) {
+    ADCON0 = 0x01;              // ADC ON, AN0 s�lectionn�
+    ADCON1 = 0x00;              // Tous les canaux analogiques
+    ADCON2 = 0b10111110;        // Fosc/64, Justification � droite, TACQ = 20 TAD
+}
 
+unsigned int ADC_Read(unsigned char channel) {
+    if(channel > 13) return 0;
 
-// Déclaration de fonctions et variables globales permettant au code C et à l'asm de les partager
-// Une même fonction ou variable côté asm est préfixée par un underscore, et ne l'est pas côté C
-// Avec ce formalisme, elles sont utilisables de façon intercangeable et transparente :
-// | ---- asm ----- | ------------- C ----------------- |
-// | _TX_64LEDS  <--|--> void TX_64LEDS(void)           |
-// | _pC         <--|--> volatile const char * pC       |
-// | _LED_MATRIX <--|--> volatile char LED_MATRIX [256] |
+    ADCON0 &= 0xC3;              // Clear bits de canal
+    ADCON0 |= (channel << 2);    // Choix du canal
+    __delay_us(10);              // Acquisition
+    GO_nDONE = 1;                
+    while(GO_nDONE);            
+    return ((ADRESH << 8) | ADRESL);
+}
 
-// Définition des fonctions relatives à la matrice de LEDs:
-extern void TX_64LEDS(void); // Fonction définie dans tx.asm ; Fonction permettant d'envoyer la commande pour piloter les 64 LEDs, telle que décrite dans LED_MATRIX
-
-// Définition des constantes / variables relatives à la matrice de LEDs :
-volatile char LED_MATRIX [256] ; // Definition d'une matrice de 64 x 4 octets contenant les composantes R/G/B/W de chaque LED (1 octet/couleur/LED)
-volatile const char * pC = LED_MATRIX; // Pointeur vers LED_MATRIX
-
-
-// - Fonction main ----------------------------------------------------------------------
 void main(void) {
-    /* Configuration des entr�es / sorties */
-    TRISB = 0b1101111; // On ouvre le port 5 (CMD_MATRIX)
+    TRISC = 0x00; // LEDs en sortie
+    LATC = 0x00;
 
-    /* Corps du programme */
-    // TODO
+    TRISA = 0xFF; // RA0 en entr�e
+    ADC_Init();   // Initialiser l?ADC
 
-    // allume le vert de la premi�re led
-    LED_MATRIX[0] = 16;
-    
-    while(1=1) {
-        TX_64LEDS();
+    while(1) {
+        unsigned int val = ADC_Read(0); // Lire AN0
+
+        // Vu-m�tre simple
+        LATC = 0x00;
+        if(val > 100) LATC |= 0x01; // RC0
+        if(val > 200) LATC |= 0x02; // RC1
+        if(val > 300) LATC |= 0x04; // RC2
+        if(val > 400) LATC |= 0x08; // RC3
+
+        __delay_ms(100);
     }
-    
-    return;
 }
