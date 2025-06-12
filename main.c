@@ -34,10 +34,10 @@ volatile const char * pC = LED_MATRIX; // Pointeur vers LED_MATRIX
 
 
 void led(int col, int row, int red, int green, int blue, int white) {
-  LED_MATRIX[(col-1)*4*8 + (row-1)*4] = green; 
-  LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 1] = red;
-  LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 2] = blue; 
-  LED_MATRIX[(col-1)*4*8 + (row-1)*4 + 3] = white; 
+  LED_MATRIX[(row-1)*4*8 + (col-1)*4] = green; 
+  LED_MATRIX[(row-1)*4*8 + (col-1)*4 + 1] = red;
+  LED_MATRIX[(row-1)*4*8 + (col-1)*4 + 2] = blue; 
+  LED_MATRIX[(row-1)*4*8 + (col-1)*4 + 3] = white; 
 }
 
 void test_col(int col, int red, int green, int blue, int white) {
@@ -130,18 +130,18 @@ void main(void) {
 
     
 //    Smiley
-    led(3, 5, 16, 16, 0, 0);
-    led(3, 6, 16, 16, 0, 0);
+    led(3, 3, 16, 16, 0, 0);
+    led(3, 4, 16, 16, 0, 0);
 
-    led(6, 6, 16, 16, 0, 0);
-    led(6, 5, 16, 16, 0, 0);
+    led(6, 3, 16, 16, 0, 0);
+    led(6, 4, 16, 16, 0, 0);
 
-    led(2, 3, 16, 16, 0, 0);
-    led(3, 2, 16, 16, 0, 0);
-    led(4, 2, 16, 16, 0, 0);
-    led(5, 2, 16, 16, 0, 0);
-    led(6, 2, 16, 16, 0, 0);
-    led(7, 3, 16, 16, 0, 0);
+    led(2, 6, 16, 16, 0, 0);
+    led(3, 7, 16, 16, 0, 0);
+    led(4, 7, 16, 16, 0, 0);
+    led(5, 7, 16, 16, 0, 0);
+    led(6, 7, 16, 16, 0, 0);
+    led(7, 6, 16, 16, 0, 0);
     
 //    Croix
 //    led(1, 1, 16, 0, 0, 0);
