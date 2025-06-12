@@ -13,6 +13,11 @@
 
 #define _XTAL_FREQ 64000000 // Frequence d'horloge - necessaire aux macros de delay (_delay(N) ; __delay_us(N) ; __delay_ms(N)))
 
+#define CHANNEL_4 0b000010 // RA2 = TPE4
+#define CHANNEL_3 0b000011 // RA3 = TPE3
+#define CHANNEL_2 0b000100 // RA4 = TPE2
+#define CHANNEL_1 0b000101 // RA5 = TPE1
+
 // DÃ©finition des masques, macros, etc. :
 // TODO
 
@@ -116,6 +121,27 @@ void allumer_col_volume(int col, int volume, int red, int green, int blue, int w
     }
 }
 
+void ADC_Init(void) {
+    // TODO pas sûr, à tester
+    TRISA = 0b00111100;     // RA2 à RA5 en entrée
+    ANSELA = 0b00111100;   // RA2 à RA5 en analogique
+
+    ADREF = 0x00;             // Référence = VDD et VSS
+    ADCLK = 0x3F;             // Clock = Fosc / 128
+    ADCON0 = 0x84;            // ADC ON, Right justified, Fosc clock
+}
+
+unsigned int ADC_Read(int channel) {
+    // Sélectionner le channel
+    ADPCH = channel; 
+    
+    // Lire la valeur
+    ADCON0bits.GO = 1;
+    while(ADCON0bits.GO);
+    
+    return ((ADRESH << 8) | ADRESL);
+}
+
 // - Fonction main ----------------------------------------------------------------------
 void main(void) {
     /* Configuration des entrées / sorties */
@@ -123,11 +149,8 @@ void main(void) {
 
 
     TRISC &= 0x00; // leds 0-7 en sortie
-    LATC  = 0xFF; // leds 0-7 allumées
     
-    /* Corps du programme */
-    // TODO
-
+    ADC_Init();
     
 //    Smiley
     led(3, 3, 16, 16, 0, 0);
@@ -174,6 +197,18 @@ void main(void) {
     led(8, 1, 0, 0, 0, 0);
     
     while(1) {
+        unsigned int val = ADC_Read(CHANNEL_1);
+        
+        LATC = 0x00;
+        if(val > 50) LATC |= 0b00000001;
+        if(val > 100) LATC |= 0b00000010;
+        if(val > 150) LATC |= 0b00000100;
+        if(val > 200) LATC |= 0b00001000;
+        if(val > 250) LATC |= 0b00010000;
+        if(val > 300) LATC |= 0b00100000;
+        if(val > 350) LATC |= 0b01000000;
+        if(val > 400) LATC |= 0b10000000;
+        
         // reset les leds en envoyant 0 pendant plus de 80us (88us mesuré)
         __delay_us(200); 
         TX_64LEDS(); 
