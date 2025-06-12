@@ -37,34 +37,11 @@ extern void TX_64LEDS(void); // Fonction dÃ©finie dans tx.asm ; Fonction perme
 volatile char LED_MATRIX [256] ; // Definition d'une matrice de 64 x 4 octets contenant les composantes R/G/B/W de chaque LED (1 octet/couleur/LED)
 volatile const char * pC = LED_MATRIX; // Pointeur vers LED_MATRIX
 
-
 void led(int col, int row, int red, int green, int blue, int white) {
   LED_MATRIX[(row-1)*4*8 + (col-1)*4] = green; 
   LED_MATRIX[(row-1)*4*8 + (col-1)*4 + 1] = red;
   LED_MATRIX[(row-1)*4*8 + (col-1)*4 + 2] = blue; 
   LED_MATRIX[(row-1)*4*8 + (col-1)*4 + 3] = white; 
-}
-
-void test_col(int col, int red, int green, int blue, int white) {
-  led(col, 1, red, green, blue, white);
-  led(col, 2, red, green, blue, white);
-  led(col, 3, red, green, blue, white);
-  led(col, 4, red, green, blue, white);
-  led(col, 5, red, green, blue, white);
-  led(col, 6, red, green, blue, white);    
-  led(col, 7, red, green, blue, white);
-  led(col, 8, red, green, blue, white);
-}
-
-void test_row(int row, int red, int green, int blue, int white) {
-  led(1, row, red, green, blue, white);
-  led(2, row, red, green, blue, white);
-  led(3, row, red, green, blue, white);
-  led(4, row, red, green, blue, white);
-  led(5, row, red, green, blue, white);
-  led(6, row, red, green, blue, white);    
-  led(7, row, red, green, blue, white);
-  led(8, row, red, green, blue, white);
 }
 
 // volume entre 0 compris et 8 compris
@@ -122,7 +99,6 @@ void allumer_col_volume(int col, int volume, int red, int green, int blue, int w
 }
 
 void ADC_Init(void) {
-    // TODO pas sûr, à tester
     TRISA = 0b00111100;     // RA2 à RA5 en entrée
     ANSELA = 0b00111100;   // RA2 à RA5 en analogique
 
@@ -147,62 +123,34 @@ void main(void) {
     /* Configuration des entrées / sorties */
     TRISB &= 0b11011111; // port 5 en sortie (CMD_MATRIX)
 
-
     TRISC &= 0x00; // leds 0-7 en sortie
     
     ADC_Init();
     
-//    Smiley
-    led(3, 3, 16, 16, 0, 0);
-    led(3, 4, 16, 16, 0, 0);
-
-    led(6, 3, 16, 16, 0, 0);
-    led(6, 4, 16, 16, 0, 0);
-
-    led(2, 6, 16, 16, 0, 0);
-    led(3, 7, 16, 16, 0, 0);
-    led(4, 7, 16, 16, 0, 0);
-    led(5, 7, 16, 16, 0, 0);
-    led(6, 7, 16, 16, 0, 0);
-    led(7, 6, 16, 16, 0, 0);
-    
-//    Croix
-//    led(1, 1, 16, 0, 0, 0);
-//    led(2, 2, 16, 0, 0, 0);
-//    led(3, 3, 16, 0, 0, 0);
-//    led(4, 4, 16, 0, 0, 0);
-//    led(5, 5, 16, 0, 0, 0);
-//    led(6, 6, 16, 0, 0, 0);
-//    led(7, 7, 16, 0, 0, 0);
-//    led(8, 8, 16, 0, 0, 0);
-//
-//    led(1, 8, 16, 0, 0, 0);
-//    led(2, 7, 16, 0, 0, 0);
-//    led(3, 6, 16, 0, 0, 0);
-//    led(4, 5, 16, 0, 0, 0);
-//    led(5, 4, 16, 0, 0, 0);
-//    led(6, 3, 16, 0, 0, 0);
-//    led(7, 2, 16, 0, 0, 0);
-//    led(8, 1, 16, 0, 0, 0);
-    
-//    Ligne
-//    test_row(1, 16, 0, 0, 0);
-
-//    Colonne
-//    test_col(2, 16, 0, 0, 0);
-//    test_col(4, 16, 0, 0, 0); 
-//    test_col(8, 16, 0, 0, 0);
-    
-    // éteindre la led col8 row1 car défectueuse sur une matrice
-    led(8, 1, 0, 0, 0, 0);
-    
     while(1) {
-        unsigned int val = ADC_Read(CHANNEL_1);
+        unsigned int volume_ch1 = ADC_Read(CHANNEL_1);
+        allumer_col_volume(1, volume_ch1, 16, 0, 0, 0);
+        allumer_col_volume(2, volume_ch1, 16, 0, 0, 0);
         
-        allumer_col_volume(1, val, 16, 0, 0, 0);
+        unsigned int volume_ch2 = ADC_Read(CHANNEL_2);
+        allumer_col_volume(3, volume_ch2, 16, 16, 0, 0);
+        allumer_col_volume(4, volume_ch2, 16, 16, 0, 0);
         
+        unsigned int volume_ch3 = ADC_Read(CHANNEL_3);
+        allumer_col_volume(5, volume_ch3, 16, 16, 16, 0);
+        allumer_col_volume(6, volume_ch3, 16, 16, 16, 0);
+        
+        unsigned int volume_ch4 = ADC_Read(CHANNEL_4);
+        allumer_col_volume(7, volume_ch4, 16, 0, 16, 0);
+        allumer_col_volume(8, volume_ch4, 16, 0, 16, 0);
+        
+        // TODO voir si toujours nécessaire maintenant qu'on a des instructions dans la boucle
         // reset les leds en envoyant 0 pendant plus de 80us (88us mesuré)
         __delay_us(200); 
+        
+        // éteindre la led col8 row1 car défectueuse sur une matrice
+        led(8, 1, 0, 0, 0, 0);
+    
         TX_64LEDS(); 
     }
       
