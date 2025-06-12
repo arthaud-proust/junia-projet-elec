@@ -7,38 +7,35 @@
 #define _XTAL_FREQ 64000000
 
 void ADC_Init(void) {
-    ADCON0 = 0x01;              // ADC ON, AN0 sélectionné
-    ADCON1 = 0x00;              // Tous les canaux analogiques
-    ADCON2 = 0b10111110;        // Fosc/64, Justification à droite, TACQ = 20 TAD
+    TRISAbits.TRISA2 = 1;     // RA0 en entrée
+    ANSELAbits.ANSELA2 = 1;   // RA0 en analogique
+
+    ADPCH = 0b00000010;             // Sélectionner ANA0 / RA0
+    ADREF = 0x00;             // Référence = VDD et VSS
+    ADCLK = 0x3F;             // Clock = Fosc / 128
+    ADCON0 = 0x84;            // ADC ON, Right justified, Fosc clock
 }
 
-unsigned int ADC_Read(unsigned char channel) {
-    if(channel > 13) return 0;
-
-    ADCON0 &= 0xC3;              // Clear bits de canal
-    ADCON0 |= (channel << 2);    // Choix du canal
-    __delay_us(10);              // Acquisition
-    GO_nDONE = 1;                
-    while(GO_nDONE);            
+unsigned int ADC_Read(void) {
+    ADCON0bits.GO = 1;
+    while(ADCON0bits.GO);
     return ((ADRESH << 8) | ADRESL);
 }
 
 void main(void) {
-    TRISC = 0x00; // LEDs en sortie
+    TRISC = 0x00; // LEDs de test en sortie
     LATC = 0x00;
 
-    TRISA = 0xFF; // RA0 en entrée
-    ADC_Init();   // Initialiser l?ADC
+    ADC_Init();
 
-    while(1) {
-        unsigned int val = ADC_Read(0); // Lire AN0
+    while (1) {
+        unsigned int val = ADC_Read();
 
-        // Vu-mètre simple
         LATC = 0x00;
-        if(val > 100) LATC |= 0x01; // RC0
-        if(val > 200) LATC |= 0x02; // RC1
-        if(val > 300) LATC |= 0x04; // RC2
-        if(val > 400) LATC |= 0x08; // RC3
+        if(val > 100) LATC |= 0x01;
+        if(val > 200) LATC |= 0x02;
+        if(val > 300) LATC |= 0x04;
+        if(val > 400) LATC |= 0x08;
 
         __delay_ms(100);
     }
