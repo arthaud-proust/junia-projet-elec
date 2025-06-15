@@ -9,149 +9,152 @@
 // Configuration materielle du PIC :
 #pragma config FEXTOSC = OFF           // Pas de source d'horloge externe
 #pragma config RSTOSC = HFINTOSC_64MHZ // Horloge interne de 64 MHz
-#pragma config WDTE = OFF              // DÃ©sactiver le watchdog
+#pragma config WDTE = OFF              // Désactiver le watchdog
 
 #define _XTAL_FREQ 64000000 // Frequence d'horloge - necessaire aux macros de delay (_delay(N) ; __delay_us(N) ; __delay_ms(N)))
 
+// Les canaux d'entrée du son
 #define CHANNEL_4 0b000010 // RA2 = TPE4
 #define CHANNEL_3 0b000011 // RA3 = TPE3
 #define CHANNEL_2 0b000100 // RA4 = TPE2
 #define CHANNEL_1 0b000101 // RA5 = TPE1
 
-// DÃ©finition des masques, macros, etc. :
-// TODO
-
-
-// DÃ©claration de fonctions et variables globales permettant au code C et Ã l'asm de les partager
-// Une mÃªme fonction ou variable cÃ´tÃ© asm est prÃ©fixÃ©e par un underscore, et ne l'est pas cÃ´tÃ© C
-// Avec ce formalisme, elles sont utilisables de faÃ§on intercangeable et transparente :
+// Déclaration de fonctions et variables globales permettant au code C et à l'asm de les partager
+// Une même fonction ou variable côté asm est préfixée par un underscore, et ne l'est pas côté C
+// Avec ce formalisme, elles sont utilisables de façon intercangeable et transparente :
 // | ---- asm ----- | ------------- C ----------------- |
 // | _TX_64LEDS  <--|--> void TX_64LEDS(void)           |
 // | _pC         <--|--> volatile const char * pC       |
 // | _LED_MATRIX <--|--> volatile char LED_MATRIX [256] |
 
-// DÃ©finition des fonctions relatives Ã la matrice de LEDs:
-extern void TX_64LEDS(void); // Fonction dÃ©finie dans tx.asm ; Fonction permettant d'envoyer la commande pour piloter les 64 LEDs, telle que dÃ©crite dans LED_MATRIX
+// Définition des fonctions relatives à la matrice de LEDs:
+extern void TX_64LEDS(void); // Fonction définie dans tx.asm ; Fonction permettant d'envoyer la commande pour piloter les 64 LEDs, telle que décrite dans LED_MATRIX
 
-// DÃ©finition des constantes / variables relatives Ã la matrice de LEDs :
+// Définition des constantes / variables relatives à la matrice de LEDs :
 volatile char LED_MATRIX [256] ; // Definition d'une matrice de 64 x 4 octets contenant les composantes R/G/B/W de chaque LED (1 octet/couleur/LED)
 volatile const char * pC = LED_MATRIX; // Pointeur vers LED_MATRIX
 
-void led(int col, int row, int red, int green, int blue, int white) {
-  LED_MATRIX[(row-1)*4*8 + (col-1)*4] = green; 
-  LED_MATRIX[(row-1)*4*8 + (col-1)*4 + 1] = red;
-  LED_MATRIX[(row-1)*4*8 + (col-1)*4 + 2] = blue; 
-  LED_MATRIX[(row-1)*4*8 + (col-1)*4 + 3] = white; 
+// Définir l'intensité RGBW d'une led par la colonne et la ligne
+void led(int colonne, int ligne, int rouge, int vert, int bleu, int blanc) {
+  LED_MATRIX[(ligne-1)*4*8 + (colonne-1)*4] = vert; 
+  LED_MATRIX[(ligne-1)*4*8 + (colonne-1)*4 + 1] = rouge;
+  LED_MATRIX[(ligne-1)*4*8 + (colonne-1)*4 + 2] = bleu; 
+  LED_MATRIX[(ligne-1)*4*8 + (colonne-1)*4 + 3] = blanc; 
 }
 
+// Allumer une colonne en fonction du volume.
 // volume entre 0 compris et 8 compris
 // volume à 0 = aucune led allumée
 // volume à 4 = la moité du bas allumé
 // volume à 8 = toutes les leds allumés
-void allumer_col_volume(int col, int volume, int red, int green, int blue, int white) {
+void allumer_colonne_volume(int colonne, int volume, int rouge, int vert, int bleu, int blanc) {
     if(volume>=1) {
-        led(col, 8, red, green, blue, white);
+        led(colonne, 8, rouge, vert, bleu, blanc);
     } else {
-        led(col, 8, 0, 0, 0, 0);
+        led(colonne, 8, 0, 0, 0, 0);
     }
 
     if(volume>=2) {
-        led(col, 7, red, green, blue, white);
+        led(colonne, 7, rouge, vert, bleu, blanc);
     } else {
-        led(col, 7, 0, 0, 0, 0);
+        led(colonne, 7, 0, 0, 0, 0);
     }
 
     if(volume>=3) {
-        led(col, 6, red, green, blue, white);
+        led(colonne, 6, rouge, vert, bleu, blanc);
     } else {
-        led(col, 6, 0, 0, 0, 0);
+        led(colonne, 6, 0, 0, 0, 0);
     }
 
     if(volume>=4) {
-        led(col, 5, red, green, blue, white);
+        led(colonne, 5, rouge, vert, bleu, blanc);
     } else {
-        led(col, 5, 0, 0, 0, 0);
+        led(colonne, 5, 0, 0, 0, 0);
     }
 
     if(volume>=5) {
-        led(col, 4, red, green, blue, white);
+        led(colonne, 4, rouge, vert, bleu, blanc);
     } else {
-        led(col, 4, 0, 0, 0, 0);
+        led(colonne, 4, 0, 0, 0, 0);
     }
 
     if(volume>=6) {
-        led(col, 3, red, green, blue, white);
+        led(colonne, 3, rouge, vert, bleu, blanc);
     } else {
-        led(col, 3, 0, 0, 0, 0);
+        led(colonne, 3, 0, 0, 0, 0);
     }
 
     if(volume>=7) {
-        led(col, 2, red, green, blue, white);
+        led(colonne, 2, rouge, vert, bleu, blanc);
     } else {
-        led(col, 2, 0, 0, 0, 0);
+        led(colonne, 2, 0, 0, 0, 0);
     }
 
     if(volume>=8) {
-        led(col, 1, red, green, blue, white);
+        led(colonne, 1, rouge, vert, bleu, blanc);
     } else {
-        led(col, 1, 0, 0, 0, 0);
+        led(colonne, 1, 0, 0, 0, 0);
     }
 }
 
-void ADC_Init(void) {
+void intialiser_convertisseur_analogique(void) {
     TRISA = 0b00111100;     // RA2 à RA5 en entrée
-    ANSELA = 0b00111100;   // RA2 à RA5 en analogique
+    ANSELA = 0b00111100;    // RA2 à RA5 en analogique
 
-    ADREF = 0x00;             // Référence = VDD et VSS
-    ADCLK = 0x3F;             // Clock = Fosc / 128
-    ADCON0 = 0x84;            // ADC ON, Right justified, Fosc clock
+    ADREF = 0x00;           // Référence = VDD et VSS
+    ADCLK = 0x3F;           // Clock = Fosc / 128
+    ADCON0 = 0x84;          // ADC ON, justifié à gauche, Fosc clock
 }
 
-unsigned int ADC_Read(int channel) {
-    // Sélectionner le channel
-    ADPCH = channel; 
+// Lit la valeur analogique du canal indiqué.
+// La valeur de retour est normalisée entre 0 et 8
+unsigned int lire_valeur_analogique(int canal) {
+    // Sélectionner le canal
+    ADPCH = canal; 
     
     // Lire la valeur
     ADCON0bits.GO = 1;
     while(ADCON0bits.GO);
     
+    // On retroune une valeur normalisée entre 0 et 8
     return ((ADRESH << 8) | ADRESL) / 50;
 }
 
 // - Fonction main ----------------------------------------------------------------------
 void main(void) {
-    /* Configuration des entrées / sorties */
+    // Configuration des entrées / sorties
     TRISB &= 0b11011111; // port 5 en sortie (CMD_MATRIX)
-
-    TRISC &= 0x00; // leds 0-7 en sortie
-    
-    ADC_Init();
+    intialiser_convertisseur_analogique();
     
     while(1) {
-        unsigned int volume_ch1 = ADC_Read(CHANNEL_1);
-        allumer_col_volume(1, volume_ch1, 16, 0, 0, 0);
-        allumer_col_volume(2, volume_ch1, 16, 0, 0, 0);
+        // Configurer la matrice à afficher
+        unsigned int volume_ch1 = lire_valeur_analogique(CHANNEL_1);
+        allumer_colonne_volume(1, volume_ch1, 16, 0, 0, 0);
+        allumer_colonne_volume(2, volume_ch1, 16, 0, 0, 0);
         
-        unsigned int volume_ch2 = ADC_Read(CHANNEL_2);
-        allumer_col_volume(3, volume_ch2, 16, 16, 0, 0);
-        allumer_col_volume(4, volume_ch2, 16, 16, 0, 0);
+        unsigned int volume_ch2 = lire_valeur_analogique(CHANNEL_2);
+        allumer_colonne_volume(3, volume_ch2, 16, 16, 0, 0);
+        allumer_colonne_volume(4, volume_ch2, 16, 16, 0, 0);
         
-        unsigned int volume_ch3 = ADC_Read(CHANNEL_3);
-        allumer_col_volume(5, volume_ch3, 16, 16, 16, 0);
-        allumer_col_volume(6, volume_ch3, 16, 16, 16, 0);
+        unsigned int volume_ch3 = lire_valeur_analogique(CHANNEL_3);
+        allumer_colonne_volume(5, volume_ch3, 16, 16, 16, 0);
+        allumer_colonne_volume(6, volume_ch3, 16, 16, 16, 0);
         
-        unsigned int volume_ch4 = ADC_Read(CHANNEL_4);
-        allumer_col_volume(7, volume_ch4, 16, 0, 16, 0);
-        allumer_col_volume(8, volume_ch4, 16, 0, 16, 0);
+        unsigned int volume_ch4 = lire_valeur_analogique(CHANNEL_4);
+        allumer_colonne_volume(7, volume_ch4, 16, 0, 16, 0);
+        allumer_colonne_volume(8, volume_ch4, 16, 0, 16, 0);
         
-        // TODO voir si toujours nécessaire maintenant qu'on a des instructions dans la boucle
-        // reset les leds en envoyant 0 pendant plus de 80us (88us mesuré)
-        __delay_us(200); 
-        
-        // éteindre la led col8 row1 car défectueuse sur une matrice
+        // éteindre la led colonne8 ligne1 car défectueuse sur une matrice
         led(8, 1, 0, 0, 0, 0);
-    
+
+        // Afficher la matrice
         TX_64LEDS(); 
+
+        // Il faut réinitialiser la matrice régulièrement pour annuler les décalages
+        // et éviter qu'un décalage induit au démarrage de la carte persiste.
+        // Pour ça il faut envoyer 0v pendant plus de 80us
+        // Comme les signaux envoyés se terminent toujours par 0v, on mets juste du délai.
+        __delay_us(100);     
     }
       
     return;

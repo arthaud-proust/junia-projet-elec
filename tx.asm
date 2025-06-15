@@ -22,13 +22,12 @@ global _TX_64LEDS ; Fonction définie dans tx.asm ; Fonction permettant d'envoye
 global _pC         ; Constante définie dans main.c ; Pointeur vers LED_MATRIX
 global _LED_MATRIX ; Variable  définie dans main.c ; Tableau (256 octets = 64 x 4) des composantes RGBW de la matrice LED (1 octet/couleur/LED)
 
-    
 SEND_0 MACRO
-    ; on envoie :
+    ; Le signal "0" correspond à :
     ; HAUT pendant 0,32us
     ; BAS pendant 0,93us
 
-    BSF LATB, 5 ; allumer le bit 5 de CMD_MATRIX
+    BSF LATB, 5 ; allumer le bit de contrôle de la matrice
     ; on doit envoyer le signal pendant 0,32us
     ; (nombre de NOP déterminé expérimentalement)
     NOP
@@ -36,8 +35,7 @@ SEND_0 MACRO
     NOP
     NOP
 
-
-    BCF LATB, 5 ; éteindre le bit 5 de CMD_MATRIX
+    BCF LATB, 5 ; éteindre le bit de contrôle de la matrice
     ; on doit envoyer le signal pendant 0,93us
     NOP
     NOP
@@ -48,11 +46,11 @@ ENDM
 
     
 SEND_1 MACRO
-    ; on envoie 
+    ; Le signal "1" correspond à :
     ; HAUT pendant 0,82us
     ; BAS pendant 0,43us
 
-    BSF LATB, 5 ; allumer le bit 5 de CMD_MATRIX
+    BSF LATB, 5 ; allumer le bit de contrôle de la matrice
     ; on doit envoyer le signal pendant 0,82us
     ; (nombre de NOP déterminé expérimentalement)
     NOP
@@ -67,19 +65,25 @@ SEND_1 MACRO
     NOP
     NOP
 
-
-
-    BCF LATB, 5 ; éteindre le bit 5 de CMD_MATRIX
+    BCF LATB, 5 ; éteindre le bit de contrôle de la matrice
     ; on doit envoyer le signal pendant 0,43us
     ; pas besoin de NOP car les tests/goto prennent déjà ce temps à s'exécuter
 ENDM
       
     
+; on fait une "fonction" plutôt qu'une macro pour éviter la collision de labels
 SEND_OCTET: 
-    ; Désormais, dans l'exécution de l'instruction suivante, la valeur pointée par <FSR0H-FSR0L> est chargée dans WREG, et <FSR0H-FSR0L> est incrémenté :
-    ; incrémente de un octet
+    ; Incrémente de un octet
+    ; Dans l'exécution de l'instruction suivante, la valeur pointée par <FSR0H-FSR0L> est chargée dans WREG, et <FSR0H-FSR0L> est incrémenté :
     MOVF POSTINC0, 0, 0
     
+    ; Les if/elses suivant sont optimisés pour prendre le moins de temps possible.
+    ; Ce temps gagné est primordial car on ne peut pas enlever de NOP dans la macro SEND_1. 
+    ; Il faut rogner du temps ici.
+    ; On n'a pas trouvé meilleure façon de faire des if/else jusqu'à présent :
+    ; - équilibré (autant de GOTO dans le if que dans le else)
+    ; - rapide : 1 test de bit + 1 GOTO dans chaque cas.
+
     BTFSC WREG, 7 ; saute l'instruction suivante si le bit==0
     GOTO B7_SEND_1 ; si le bit==1
     SEND_0
@@ -162,4 +166,3 @@ _TX_64LEDS:
     REPT 256
 	CALL SEND_OCTET
     ENDM
-    
